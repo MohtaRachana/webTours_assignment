@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
   workflow_dispatch:
 
 jobs:
@@ -26,7 +26,7 @@ jobs:
       - name: Create reports directory
         run: mkdir -p reports/html
 
-      - name: JMeter Test
+      - name: Run JMeter Test
         run: $HOME/apache-jmeter/bin/jmeter -n -t webTours.jmx -l result.jtl
 
       - name: Check if result.jtl exists
@@ -34,10 +34,15 @@ jobs:
           if [ ! -f "result.jtl" ]; then
             echo "result.jtl not found!"
             exit 1
+          else
+            echo "result.jtl found."
           fi
 
       - name: Generate HTML Report
         run: $HOME/apache-jmeter/bin/jmeter -g result.jtl -o ./reports/html/
+
+      - name: List result.jtl contents for debug
+        run: cat result.jtl
 
       - name: List report directory contents for debug
         run: ls -la ./reports/html/
