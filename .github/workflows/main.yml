@@ -32,7 +32,7 @@ jobs:
         run: $HOME/apache-jmeter/bin/jmeter -n -t webTours.jmx -l result.jtl
  
       - name: Generate HTML Report
-        run: $HOME/apache-jmeter/bin/jmeter -l result.jtl -e -o ./reports/html/
+        run: $HOME/apache-jmeter/bin/jmeter -l result.jtl -o ./reports/html/
  
       - name: Upload Results
         uses: actions/upload-artifact@v3
