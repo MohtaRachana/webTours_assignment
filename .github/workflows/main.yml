@@ -27,26 +27,41 @@ jobs:
         run: mkdir -p reports/html
 
       - name: Run JMeter Test
-        run: $HOME/apache-jmeter/bin/jmeter -n -t webTours.jmx -l result.jtl
+        run: $HOME/apache-jmeter/bin/jmeter -n -t webTours.jmx -l result.jtl -j jmeter.log
 
-      - name: Check if result.jtl exists
+      - name: Check if result.jtl exists and has content
         run: |
           if [ ! -f "result.jtl" ]; then
             echo "result.jtl not found!"
             exit 1
+          elif [ ! -s "result.jtl" ]; then
+            echo "result.jtl is empty!"
+            cat jmeter.log
+            exit 1
           else
-            echo "result.jtl found."
+            echo "result.jtl found and has content."
           fi
+
+      - name: List result.jtl contents for debug
+        run: cat result.jtl
 
       - name: Generate HTML Report
         run: |
           $HOME/apache-jmeter/bin/jmeter -g result.jtl -o ./reports/html/ || (echo "Generating HTML report failed"; cat jmeter.log; exit 1)
 
-      - name: List result.jtl contents for debug
-        run: cat result.jtl
-
       - name: List report directory contents for debug
         run: ls -la ./reports/html/
+
+      - name: Print JMeter log on failure
+        if: failure()
+        run: cat jmeter.log
+
+      - name: Upload JMeter log
+        uses: actions/upload-artifact@v3
+        with:
+          name: jmeter-log
+          path: jmeter.log
+          if-no-files-found: error
 
       - name: Upload Results
         uses: actions/upload-artifact@v3
