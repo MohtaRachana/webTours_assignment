@@ -39,7 +39,8 @@ jobs:
           fi
 
       - name: Generate HTML Report
-        run: $HOME/apache-jmeter/bin/jmeter -g result.jtl -o ./reports/html/
+        run: |
+          $HOME/apache-jmeter/bin/jmeter -g result.jtl -o ./reports/html/ || (echo "Generating HTML report failed"; cat jmeter.log; exit 1)
 
       - name: List result.jtl contents for debug
         run: cat result.jtl
